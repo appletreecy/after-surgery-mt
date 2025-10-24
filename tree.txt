@@ -1,0 +1,48 @@
+after-surgery-mt/
+├─ README.md
+├─ .env                   # optional: compose env (MYSQL_ROOT_PASSWORD, etc.)
+├─ docker-compose.yml     # MySQL with host-mounted volume + init scripts
+├─ mysql-data/            # <created on first run> MySQL data persisted locally
+├─ db/
+│  └─ init/               # auto-run once on first container start (empty data dir)
+│     ├─ 001-schema.sql   # tenants, users, after_surgery_records tables
+│     └─ 002-appuser.sql  # create appuser/apppass & GRANT on asurgery
+│
+├─ cxx-backend/           # Drogon C++ API server
+│  ├─ CMakeLists.txt
+│  ├─ config.json         # drogon listener/logging config
+│  ├─ .env.example        # DB_HOST/DB_USER/DB_PASS, JWT_SECRET, etc.
+│  └─ src/
+│     ├─ main.cpp
+│     ├─ util/
+│     │  └─ Db.h          # builds MySQL connection string from env
+│     ├─ middleware/
+│     │  ├─ TenantGuard.h
+│     │  └─ TenantGuard.cc
+│     ├─ auth/
+│     │  ├─ Jwt.h
+│     │  ├─ Jwt.cc
+│     │  ├─ Password.h
+│     │  └─ Password.cc
+│     ├─ repo/
+│     │  ├─ Repo.h
+│     │  └─ Repo.cc
+│     └─ controllers/
+│        ├─ AuthCtrl.h
+│        ├─ AuthCtrl.cc
+│        ├─ RecordsCtrl.h
+│        └─ RecordsCtrl.cc
+│
+└─ react-tenant-ui/       # Vite + React + Tailwind UI
+   ├─ package.json
+   ├─ index.html
+   ├─ vite.config.js
+   ├─ .env                # VITE_API_BASE, VITE_DEFAULT_TENANT
+   ├─ postcss.config.js
+   ├─ tailwind.config.js
+   └─ src/
+      ├─ main.jsx
+      ├─ index.css
+      ├─ App.jsx          # login + tenant selector + table (list/add)
+      └─ api/
+         └─ client.js     # axios with X-Tenant + Authorization headers

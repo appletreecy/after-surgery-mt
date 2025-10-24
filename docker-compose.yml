@@ -1,0 +1,30 @@
+version: "3.9"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-mt
+    restart: unless-stopped
+    ports:
+      - "3308:3306"
+    environment:
+      # set these via .env or inline here
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: asurgery
+      # Optionally create a regular user automatically (uncomment if you want)
+      # MYSQL_USER: ${MYSQL_USER:-appuser}
+      # MYSQL_PASSWORD: ${MYSQL_PASSWORD:-apppass}
+    command:
+      # sensible defaults for emojis/utf8
+      - "--character-set-server=utf8mb4"
+      - "--collation-server=utf8mb4_unicode_ci"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-prootpass"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    volumes:
+      # 1) real data persisted on your local drive
+      - ./mysql-data:/var/lib/mysql
+      # 2) init scripts auto-run on first container startup
+      - ./db/init:/docker-entrypoint-initdb.d
